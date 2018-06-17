@@ -29,7 +29,17 @@
         android:layout_below="@id/place_autocomplete"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
+
         android:layout_height="match_parent"
+        android:layout_marginBottom="50dp"
         tools:context=".HomeActivity" />
+
+    <com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx
+        android:id="@+id/bnve"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#ffff"
+        app:menu="@menu/bottom_nav" />
 
 </RelativeLayout>

@@ -3,7 +3,9 @@ package com.vrishankgupta.triposse;
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -11,8 +13,10 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -31,6 +35,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -41,6 +48,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -59,12 +67,10 @@ public class MainActivity extends AppCompatActivity
     PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
     private String provider = null;
-
+    Circle c;
     private Marker mCurrentPosition = null;
     Marker marker;
-
-
-
+    CircleOptions mOptions;
 
 
     @Override
@@ -79,6 +85,11 @@ public class MainActivity extends AppCompatActivity
 
         if (perm == PackageManager.PERMISSION_GRANTED) {
             start();
+            final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                buildAlertMessageNoGps();
+            }
+
         } else {
             ActivityCompat.requestPermissions(
                     MainActivity.this,
@@ -108,6 +119,7 @@ public class MainActivity extends AppCompatActivity
                 flag = true;
                 Log.d("Maps", "Place selected: " + place.getLatLng());
                 marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()).zIndex(800));
+
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 mMap.animateCamera(CameraUpdateFactory.zoomIn());
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
@@ -134,6 +146,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -142,6 +155,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
     }
 
 
@@ -155,6 +169,7 @@ public class MainActivity extends AppCompatActivity
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                start();
+
             }
         }
         else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
@@ -249,6 +264,25 @@ public class MainActivity extends AppCompatActivity
 
 //region Maps Methods
     public void onMapReady(GoogleMap googleMap) {
+        LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {
+            Log.e("Error", "onMapReady: ");
+        }
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {
+            Log.e("Error", "onMapReady: " );
+        }
+
+        if(!gps_enabled && !network_enabled) {
+            buildAlertMessageNoGps();
+        }
         mMap = googleMap;
 
         mMap = googleMap;
@@ -313,7 +347,7 @@ public class MainActivity extends AppCompatActivity
                 addBoundaryToCurrentPosition(lat, lng);
 
             CameraPosition camPosition = new CameraPosition.Builder()
-                    .target(new LatLng(lat, lng)).zoom(10f).build();
+                    .target(new LatLng(lat, lng)).zoom(12f).build();
 
             if (mMap != null && !flag)
                 mMap.animateCamera(CameraUpdateFactory
@@ -346,10 +380,24 @@ public class MainActivity extends AppCompatActivity
                 .fromResource(R.drawable.ic_location));
 
         mMarkerOptions.anchor(0.5f, 0.5f);
-            CircleOptions mOptions = new CircleOptions()
-                    .center(new LatLng(lat, lang)).radius(10000)
+
+        if( mOptions == null)
+        {
+            mOptions = new CircleOptions()
+                .center(new LatLng(lat, lang)).radius(5000)
+                .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
+
+            c = mMap.addCircle(mOptions);
+        }
+        else {
+            c.remove();
+
+            mOptions = new CircleOptions()
+                    .center(new LatLng(lat, lang)).radius(5000)
                     .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
-            mMap.addCircle(mOptions);
+
+            c = mMap.addCircle(mOptions);
+        }
 
         if (mCurrentPosition != null)
             mCurrentPosition.remove();
@@ -384,5 +432,33 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+
+    public void buildAlertMessageNoGps()
+    {
+        new MaterialDialog.Builder(this)
+                .title("Location")
+                .content("Enable Location")
+                .positiveText("Enable GPS!")
+                .negativeText("No, Thanks!")
+                .cancelable(false)
+                .positiveColor(Color.rgb(232,42,42))
+                .negativeColor(Color.rgb(232,42,42))
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Toast.makeText(MainActivity.this, "Location Access Required!!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
   //endregion
 }
