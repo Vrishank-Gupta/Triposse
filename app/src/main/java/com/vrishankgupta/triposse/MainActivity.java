@@ -48,8 +48,11 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
+import com.vrishankgupta.triposse.util.BottomNavigationViewHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,6 +71,7 @@ public class MainActivity extends AppCompatActivity
     private Marker mCurrentPosition = null;
     Marker marker;
     CircleOptions mOptions;
+    Location l;
 
 
     @Override
@@ -86,6 +90,7 @@ public class MainActivity extends AppCompatActivity
             if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
                 buildAlertMessageNoGps();
             }
+
 
         } else {
             ActivityCompat.requestPermissions(
@@ -106,6 +111,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         placeAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete);
+
 
         placeAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
@@ -149,6 +155,8 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+        setupBottomNavigationView();
+
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -284,6 +292,19 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+    private void setupBottomNavigationView()
+    {
+        Log.d("BottomNv", "setupBottomNavigationView: setting up botNavView");
+        BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bnve);
+        BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
+        BottomNavigationViewHelper.enableNavigation(this,bottomNavigationViewEx);
+        Menu menu = bottomNavigationViewEx.getMenu();
+        MenuItem menuItem = menu.getItem(0);
+        menuItem.setChecked(true);
+    }
  //endregion
 
 //region Maps Methods
@@ -331,6 +352,9 @@ public class MainActivity extends AppCompatActivity
             long minTime = 5000;// ms
             float minDist = 5.0f;// meter
             mLocationManager.requestLocationUpdates(provider, minTime, minDist, this);
+            l=location;
+            if(l != null)
+                placeAutoComplete.setBoundsBias(new LatLngBounds(new LatLng(l.getLatitude(),l.getLongitude()),new LatLng(l.getLatitude()+2,l.getLongitude()+2)));
         }
     }
 
