@@ -2,6 +2,7 @@ package com.vrishankgupta.triposse;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -21,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -45,6 +47,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -59,6 +62,10 @@ public class MainActivity extends AppCompatActivity
 
     private Marker mCurrentPosition = null;
     Marker marker;
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +90,7 @@ public class MainActivity extends AppCompatActivity
 
 
     }
+
 
     public void start()
     {
@@ -136,6 +144,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
@@ -154,7 +164,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-
+//region NavDrawer Activity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -184,6 +194,30 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
 
+        List<String> HelpLineNumbers = new ArrayList<>();
+        HelpLineNumbers.add("Women's Helpline");
+        HelpLineNumbers.add("Police");
+        HelpLineNumbers.add("Hospital");
+        HelpLineNumbers.add("Fire Department");
+        HelpLineNumbers.add("Ambulance");
+        HelpLineNumbers.add("Men's Helpline");
+
+        final CharSequence[] helpLine = HelpLineNumbers.toArray(new String[HelpLineNumbers.size()]);
+
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+        mBuilder.setTitle("Helpline Numbers");
+
+        mBuilder.setItems(helpLine, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String selectedText = helpLine[i].toString();
+            }
+        });
+
+        AlertDialog alertDialogObject = mBuilder.create();
+        //Show the dialog
+        alertDialogObject.show();
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -211,8 +245,9 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+ //endregion
 
-
+//region Maps Methods
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
@@ -274,8 +309,8 @@ public class MainActivity extends AppCompatActivity
         if (location != null && provider != null) {
             double lng = location.getLongitude();
             double lat = location.getLatitude();
-
-            addBoundaryToCurrentPosition(lat, lng);
+            if(!flag)
+                addBoundaryToCurrentPosition(lat, lng);
 
             CameraPosition camPosition = new CameraPosition.Builder()
                     .target(new LatLng(lat, lng)).zoom(10f).build();
@@ -311,11 +346,11 @@ public class MainActivity extends AppCompatActivity
                 .fromResource(R.drawable.ic_location));
 
         mMarkerOptions.anchor(0.5f, 0.5f);
+            CircleOptions mOptions = new CircleOptions()
+                    .center(new LatLng(lat, lang)).radius(10000)
+                    .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
+            mMap.addCircle(mOptions);
 
-        CircleOptions mOptions = new CircleOptions()
-                .center(new LatLng(lat, lang)).radius(10000)
-                .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
-        mMap.addCircle(mOptions);
         if (mCurrentPosition != null)
             mCurrentPosition.remove();
         mCurrentPosition = mMap.addMarker(mMarkerOptions);
@@ -349,4 +384,5 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+  //endregion
 }
