@@ -2,6 +2,7 @@ package com.vrishankgupta.triposse;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -18,6 +19,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -46,6 +48,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -230,6 +233,33 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+        if(id == R.id.emergency){
+            //Added by Shivam
+            List<String> HelpLineNumbers = new ArrayList<>();
+            HelpLineNumbers.add("Women's Helpline");
+            HelpLineNumbers.add("Police");
+            HelpLineNumbers.add("Hospital");
+            HelpLineNumbers.add("Fire Department");
+            HelpLineNumbers.add("Ambulance");
+            HelpLineNumbers.add("Men's Helpline");
+
+            final CharSequence[] helpLine = HelpLineNumbers.toArray(new String[HelpLineNumbers.size()]);
+
+            AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+            mBuilder.setTitle("Helpline Numbers");
+
+            mBuilder.setItems(helpLine, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    String selectedText = helpLine[i].toString();
+                }
+            });
+
+            AlertDialog alertDialogObject = mBuilder.create();
+            //Show the dialog
+            alertDialogObject.show();
+
         }
 
         return super.onOptionsItemSelected(item);
