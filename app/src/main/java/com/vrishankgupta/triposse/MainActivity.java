@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Criteria;
 import android.location.Geocoder;
@@ -12,26 +13,32 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.View;
-import android.support.design.widget.NavigationView;
+
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
@@ -42,6 +49,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -60,9 +68,11 @@ public class MainActivity extends AppCompatActivity
     PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
     private String provider = null;
-
+    Circle c;
     private Marker mCurrentPosition = null;
     Marker marker;
+    CircleOptions mOptions;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,55 +85,12 @@ public class MainActivity extends AppCompatActivity
                 Manifest.permission.ACCESS_COARSE_LOCATION);
 
         if (perm == PackageManager.PERMISSION_GRANTED) {
+            start();
+            final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+            if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
+                buildAlertMessageNoGps();
+            }
 
-            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-            setSupportActionBar(toolbar);
-
-            placeAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete);
-
-            placeAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                @Override
-                public void onPlaceSelected(Place place) {
-                    if (marker != null)
-                        marker.remove();
-
-
-                    Log.d("Maps", "Place selected: " + place.getLatLng());
-                    marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()).zIndex(800));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                    mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
-
-                }
-
-
-                @Override
-                public void onError(Status status) {
-                    Log.d("Maps", "An error occurred: " + status);
-                }
-            });
-
-            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-            mapFragment.getMapAsync(this);
-
-            FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            });
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-            drawer.addDrawerListener(toggle);
-            toggle.syncState();
-
-            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-            navigationView.setNavigationItemSelectedListener(this);
         } else {
             ActivityCompat.requestPermissions(
                     MainActivity.this,
@@ -137,6 +104,62 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    public void start()
+    {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        placeAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete);
+
+        placeAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                if (marker != null)
+                    marker.remove();
+
+                flag = true;
+                Log.d("Maps", "Place selected: " + place.getLatLng());
+                marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()).zIndex(800));
+
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
+                mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
+
+            }
+
+
+            @Override
+            public void onError(Status status) {
+                Log.d("Maps", "An error occurred: " + status);
+            }
+        });
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flag = false;
+                locateCurrentPosition();
+            }
+        });
+
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+    }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -146,55 +169,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == 44) { //write request
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
-
-                placeAutoComplete = (PlaceAutocompleteFragment) getFragmentManager().findFragmentById(R.id.place_autocomplete);
-
-                placeAutoComplete.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                    @Override
-                    public void onPlaceSelected(Place place) {
-                        if (marker != null)
-                            marker.remove();
-
-
-                        Log.d("Maps", "Place selected: " + place.getLatLng());
-                        marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()).zIndex(800));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
-                        mMap.animateCamera(CameraUpdateFactory.zoomIn());
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
-
-                    }
-
-
-                    @Override
-                    public void onError(Status status) {
-                        Log.d("Maps", "An error occurred: " + status);
-                    }
-                });
-
-                SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.map);
-                mapFragment.getMapAsync(this);
-
-                FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-                fab.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                                .setAction("Action", null).show();
-                    }
-                });
-
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawer.addDrawerListener(toggle);
-                toggle.syncState();
-
-                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-                navigationView.setNavigationItemSelectedListener(this);
-
+               start();
 
             }
         }
@@ -205,7 +180,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-
+//region NavDrawer Activity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -262,6 +237,30 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        List<String> HelpLineNumbers = new ArrayList<>();
+        HelpLineNumbers.add("Women's Helpline");
+        HelpLineNumbers.add("Police");
+        HelpLineNumbers.add("Hospital");
+        HelpLineNumbers.add("Fire Department");
+        HelpLineNumbers.add("Ambulance");
+        HelpLineNumbers.add("Men's Helpline");
+
+        final CharSequence[] helpLine = HelpLineNumbers.toArray(new String[HelpLineNumbers.size()]);
+
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+        mBuilder.setTitle("Helpline Numbers");
+
+        mBuilder.setItems(helpLine, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String selectedText = helpLine[i].toString();
+            }
+        });
+
+        AlertDialog alertDialogObject = mBuilder.create();
+        //Show the dialog
+        alertDialogObject.show();
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -289,9 +288,29 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+ //endregion
 
-
+//region Maps Methods
     public void onMapReady(GoogleMap googleMap) {
+        LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {
+            Log.e("Error", "onMapReady: ");
+        }
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {
+            Log.e("Error", "onMapReady: " );
+        }
+
+        if(!gps_enabled && !network_enabled) {
+            buildAlertMessageNoGps();
+        }
         mMap = googleMap;
 
         mMap = googleMap;
@@ -352,13 +371,13 @@ public class MainActivity extends AppCompatActivity
         if (location != null && provider != null) {
             double lng = location.getLongitude();
             double lat = location.getLatitude();
-
-            addBoundaryToCurrentPosition(lat, lng);
+            if(!flag)
+                addBoundaryToCurrentPosition(lat, lng);
 
             CameraPosition camPosition = new CameraPosition.Builder()
-                    .target(new LatLng(lat, lng)).zoom(10f).build();
+                    .target(new LatLng(lat, lng)).zoom(12f).build();
 
-            if (mMap != null)
+            if (mMap != null && !flag)
                 mMap.animateCamera(CameraUpdateFactory
                         .newCameraPosition(camPosition));
         } else {
@@ -373,9 +392,11 @@ public class MainActivity extends AppCompatActivity
             List<Address> myList = myLocation.getFromLocation(lat,lang, 1);
             Address address = (Address) myList.get(0);
             String addressStr = "";
-            addressStr += address.getAddressLine(0) + ", ";
-            addressStr += address.getAddressLine(1) + ", ";
-            placeAutoComplete.setText(addressStr);
+
+            Log.d("LOCC", address.getAddressLine(0));
+
+            addressStr += address.getAddressLine(0) ;
+//            placeAutoComplete.setText(addressStr);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -388,10 +409,24 @@ public class MainActivity extends AppCompatActivity
 
         mMarkerOptions.anchor(0.5f, 0.5f);
 
-        CircleOptions mOptions = new CircleOptions()
-                .center(new LatLng(lat, lang)).radius(10000)
+        if( mOptions == null)
+        {
+            mOptions = new CircleOptions()
+                .center(new LatLng(lat, lang)).radius(5000)
                 .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
-        mMap.addCircle(mOptions);
+
+            c = mMap.addCircle(mOptions);
+        }
+        else {
+            c.remove();
+
+            mOptions = new CircleOptions()
+                    .center(new LatLng(lat, lang)).radius(5000)
+                    .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
+
+            c = mMap.addCircle(mOptions);
+        }
+
         if (mCurrentPosition != null)
             mCurrentPosition.remove();
         mCurrentPosition = mMap.addMarker(mMarkerOptions);
@@ -400,7 +435,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onLocationChanged(Location location) {
-
         updateWithNewLocation(location);
     }
 
@@ -426,4 +460,33 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
     }
+
+    public void buildAlertMessageNoGps()
+    {
+        new MaterialDialog.Builder(this)
+                .title("Location")
+                .content("Enable Location")
+                .positiveText("Enable GPS!")
+                .negativeText("No, Thanks!")
+                .cancelable(false)
+                .positiveColor(Color.rgb(232,42,42))
+                .negativeColor(Color.rgb(232,42,42))
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        Toast.makeText(MainActivity.this, "Location Access Required!!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                })
+                .show();
+    }
+
+  //endregion
 }

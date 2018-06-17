@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<item-->
+        <!--android:id="@+id/ic_house"-->
+        <!--android:icon="@drawable/ic_home"-->
+        <!--android:title="Home">-->
+
+
+    <!--</item>-->
+
+    <!--<item-->
+        <!--android:id="@+id/ic_booking"-->
+        <!--android:icon="@drawable/ic_bookings"-->
+        <!--android:title="Bookings">-->
+
+
+    <!--</item>-->
+
+    <!--<item-->
+        <!--android:id="@+id/ic_account"-->
+        <!--android:icon="@drawable/ic_account"-->
+        <!--android:title="Account">-->
+
+
+    <!--</item>-->
+
+    <!--<item-->
+        <!--android:id="@+id/ic_voucher"-->
+        <!--android:icon="@drawable/ic_voucher"-->
+        <!--android:title="Vouchers">-->
+
+
+    <!--</item>-->
+
+    <!--<item-->
+        <!--android:id="@+id/ic_contact"-->
+        <!--android:icon="@drawable/ic_contact"-->
+        <!--android:title="Contact">-->
+
+
+    <!--</item>-->
+
+</menu>
