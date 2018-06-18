@@ -62,7 +62,7 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
-    private GoogleMap mMap;
+    public static GoogleMap mMap;
     boolean flag = false;
     PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity
     private Marker mCurrentPosition = null;
     Marker marker;
     CircleOptions mOptions;
-    Location l;
+    public static Location l;
 
 
     @Override
@@ -173,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == 44) { //write request
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-               start();
+                start();
 
             }
         }
@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity
 
 
 
-//region NavDrawer Activity
+    //region NavDrawer Activity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -276,6 +276,7 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_camera) {
             // Handle the camera action
+
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -301,13 +302,10 @@ public class MainActivity extends AppCompatActivity
         BottomNavigationViewEx bottomNavigationViewEx = findViewById(R.id.bnve);
         BottomNavigationViewHelper.setupBottomNavigationView(bottomNavigationViewEx);
         BottomNavigationViewHelper.enableNavigation(this,bottomNavigationViewEx);
-        Menu menu = bottomNavigationViewEx.getMenu();
-        MenuItem menuItem = menu.getItem(0);
-        menuItem.setChecked(true);
     }
- //endregion
+    //endregion
 
-//region Maps Methods
+    //region Maps Methods
     public void onMapReady(GoogleMap googleMap) {
         LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
@@ -340,7 +338,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void locateCurrentPosition() {
+    public void locateCurrentPosition() {
 
         int status = getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION,
                 getPackageName());
@@ -434,8 +432,8 @@ public class MainActivity extends AppCompatActivity
         if( mOptions == null)
         {
             mOptions = new CircleOptions()
-                .center(new LatLng(lat, lang)).radius(5000)
-                .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
+                    .center(new LatLng(lat, lang)).radius(5000)
+                    .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
 
             c = mMap.addCircle(mOptions);
         }
@@ -510,5 +508,7 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
-  //endregion
+    //endregion
+
+
 }
