@@ -161,7 +161,7 @@ public class BottomNavigationViewHelper {
            final Marker m =  MainActivity.mMap.addMarker(mMarkerOptions);
 
             CircleOptions mOptions;
-            Circle c;
+            final Circle c;
 
 
             mOptions = new CircleOptions()
@@ -169,6 +169,18 @@ public class BottomNavigationViewHelper {
                     .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
 
             c = MainActivity.mMap.addCircle(mOptions);
+
+            Runnable r = new Runnable() {
+                @Override
+                public void run() {
+                    m.remove();
+                    c.remove();
+                }
+            };
+
+            android.os.Handler h = new android.os.Handler();
+
+            h.postDelayed(r,10000);
         }
     }
 
