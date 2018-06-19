@@ -59,19 +59,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mehdi.sakout.fancybuttons.FancyButton;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     public static GoogleMap mMap;
-    boolean flag = false;
-    PlaceAutocompleteFragment placeAutoComplete;
+   public boolean flag = false;
+   public static  boolean markerAlready = false;
+    public static PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
     private String provider = null;
     Circle c;
     private Marker mCurrentPosition = null;
     Marker marker;
+    public static Location location;
     CircleOptions mOptions;
     public static Location l;
+    FancyButton button;
 
 
     @Override
@@ -79,6 +84,14 @@ public class MainActivity extends AppCompatActivity
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        button = findViewById(R.id.btnGuide);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(MainActivity.this, "Opens guides's details!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         int perm = ContextCompat.checkSelfPermission(
                 MainActivity.this,
@@ -99,10 +112,23 @@ public class MainActivity extends AppCompatActivity
                     44
             );
         }
-
-
-
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == 44) { //write request
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                start();
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
+            Toast.makeText(MainActivity.this, "Go to Settings and Grant the permission to use this feature.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 
     public void start()
@@ -118,11 +144,9 @@ public class MainActivity extends AppCompatActivity
             public void onPlaceSelected(Place place) {
                 if (marker != null)
                     marker.remove();
-
                 flag = true;
                 Log.d("Maps", "Place selected: " + place.getLatLng());
                 marker = mMap.addMarker(new MarkerOptions().position(place.getLatLng()).title(place.getName().toString()).zIndex(800));
-
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(place.getLatLng()));
                 mMap.animateCamera(CameraUpdateFactory.zoomIn());
                 mMap.animateCamera(CameraUpdateFactory.zoomTo(13), 2000, null);
@@ -145,7 +169,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 flag = false;
+                mMap.clear();
                 locateCurrentPosition();
+                placeAutoComplete.setText(null);
             }
         });
 
@@ -155,34 +181,12 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        setupBottomNavigationView();
 
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
     }
-
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
-        if (requestCode == 44) { //write request
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                start();
-
-            }
-        }
-        else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
-            Toast.makeText(MainActivity.this, "Go to Settings and Grant the permission to use this feature.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
 
     //region NavDrawer Activity
     @Override
@@ -204,17 +208,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
         if(id == R.id.emergency){
-            //Added by Shivam
             List<String> HelpLineNumbers = new ArrayList<>();
             HelpLineNumbers.add("Women's Helpline");
             HelpLineNumbers.add("Police");
@@ -236,7 +234,6 @@ public class MainActivity extends AppCompatActivity
             });
 
             AlertDialog alertDialogObject = mBuilder.create();
-            //Show the dialog
             alertDialogObject.show();
 
         }
@@ -305,6 +302,10 @@ public class MainActivity extends AppCompatActivity
     }
     //endregion
 
+  /*****************************************************************************************************/
+
+
+
     //region Maps Methods
     public void onMapReady(GoogleMap googleMap) {
         LocationManager lm = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
@@ -335,17 +336,22 @@ public class MainActivity extends AppCompatActivity
         {
             locateCurrentPosition();
         }
+        setupBottomNavigationView();
+
 
     }
 
-    public void locateCurrentPosition() {
+    public void locateCurrentPosition()
+    {
 
         int status = getPackageManager().checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION,
                 getPackageName());
 
         if (status == PackageManager.PERMISSION_GRANTED) {
-            Location location = mLocationManager.getLastKnownLocation(provider);
+
+            location = mLocationManager.getLastKnownLocation(provider);
             updateWithNewLocation(location);
+
             //  mLocationManager.addGpsStatusListener(this);
             long minTime = 5000;// ms
             float minDist = 5.0f;// meter
@@ -354,43 +360,17 @@ public class MainActivity extends AppCompatActivity
             if(l != null)
                 placeAutoComplete.setBoundsBias(new LatLngBounds(new LatLng(l.getLatitude(),l.getLongitude()),new LatLng(l.getLatitude()+2,l.getLongitude()+2)));
         }
+
     }
 
 
-    private boolean isProviderAvailable() {
-        mLocationManager = (LocationManager) getSystemService(
-                Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
-        criteria.setAltitudeRequired(false);
-        criteria.setBearingRequired(false);
-        criteria.setCostAllowed(true);
-        criteria.setPowerRequirement(Criteria.POWER_LOW);
 
-        provider = mLocationManager.getBestProvider(criteria, true);
-        if (mLocationManager
-                .isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            provider = LocationManager.NETWORK_PROVIDER;
-
-            return true;
-        }
-
-        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            provider = LocationManager.GPS_PROVIDER;
-            return true;
-        }
-
-        if (provider != null) {
-            return true;
-        }
-        return false;
-    }
-
-    private void updateWithNewLocation(Location location) {
+    private  void updateWithNewLocation(Location location) {
 
         if (location != null && provider != null) {
             double lng = location.getLongitude();
             double lat = location.getLatitude();
+//            BottomNavigationViewHelper.locate(location);
             if(!flag)
                 addBoundaryToCurrentPosition(lat, lng);
 
@@ -408,10 +388,13 @@ public class MainActivity extends AppCompatActivity
 
     private void addBoundaryToCurrentPosition(double lat, double lang) {
         Geocoder myLocation = new Geocoder(getApplicationContext(), Locale.getDefault());
+        String addressStr = "";
+
         try {
             List<Address> myList = myLocation.getFromLocation(lat,lang, 1);
-            Address address = (Address) myList.get(0);
-            String addressStr = "";
+            Address address;
+            address = (Address) myList.get(0);
+
 
             Log.d("LOCC", address.getAddressLine(0));
 
@@ -449,7 +432,38 @@ public class MainActivity extends AppCompatActivity
 
         if (mCurrentPosition != null)
             mCurrentPosition.remove();
-        mCurrentPosition = mMap.addMarker(mMarkerOptions);
+             mCurrentPosition = mMap.addMarker(mMarkerOptions);
+             mCurrentPosition.setTitle(addressStr);
+
+    }
+
+    private boolean isProviderAvailable() {
+        mLocationManager = (LocationManager) getSystemService(
+                Context.LOCATION_SERVICE);
+        Criteria criteria = new Criteria();
+        criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+        criteria.setAltitudeRequired(false);
+        criteria.setBearingRequired(false);
+        criteria.setCostAllowed(true);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+
+        provider = mLocationManager.getBestProvider(criteria, true);
+        if (mLocationManager
+                .isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            provider = LocationManager.NETWORK_PROVIDER;
+
+            return true;
+        }
+
+        if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            provider = LocationManager.GPS_PROVIDER;
+            return true;
+        }
+
+        if (provider != null) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -509,6 +523,4 @@ public class MainActivity extends AppCompatActivity
     }
 
     //endregion
-
-
 }

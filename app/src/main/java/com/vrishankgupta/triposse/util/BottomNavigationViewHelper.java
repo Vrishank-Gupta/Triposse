@@ -2,6 +2,7 @@ package com.vrishankgupta.triposse.util;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
@@ -9,10 +10,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.vrishankgupta.triposse.MainActivity;
 import com.vrishankgupta.triposse.Nearby_Places.GetNearbyPlacesData;
 import com.vrishankgupta.triposse.R;
+
+import java.util.logging.Handler;
 
 public class BottomNavigationViewHelper {
 
@@ -20,6 +31,7 @@ public class BottomNavigationViewHelper {
     private static final String TAG = "BottomNavigationViewHel";
     static Menu menu;
     static MenuItem menuItem;
+    public static Location l;
     public static void setupBottomNavigationView(BottomNavigationViewEx bottomNavigationViewEx)
     {
         Log.d(TAG, "setupBottomNavigationView: setting up BottomNavView");
@@ -28,8 +40,8 @@ public class BottomNavigationViewHelper {
         bottomNavigationViewEx.enableShiftingMode(false);
         bottomNavigationViewEx.setTextVisibility(true);
         menu = bottomNavigationViewEx.getMenu();
-        menuItem = menu.getItem(0);
-        menuItem.setChecked(false);
+//        menuItem = menu.getItem(0);
+//        menuItem.setChecked(false);
     }
 
 
@@ -47,6 +59,9 @@ public class BottomNavigationViewHelper {
 
                         Log.d("onClick", "Button is Clicked");
                         MainActivity.mMap.clear();
+                        locate(MainActivity.location);
+                        MainActivity.markerAlready = false;
+                        MainActivity.placeAutoComplete.setText("Hospitals near me");
                         String urlhospital = getUrl(MainActivity.l.getLatitude(), MainActivity.l.getLongitude(), Hospital);
                         Object[] DataTransferhospital = new Object[2];
                         DataTransferhospital[0] = MainActivity.mMap;
@@ -64,6 +79,11 @@ public class BottomNavigationViewHelper {
 
                         Log.d("onClick", "Button is Clicked");
                         MainActivity.mMap.clear();
+                        locate(MainActivity.location);
+                        MainActivity.markerAlready = false;
+
+                        MainActivity.placeAutoComplete.setText("Police Stations near me");
+
                         String urlpolice = getUrl(MainActivity.l.getLatitude(), MainActivity.l.getLongitude(), Police);
                         Object[] DataTransferpolice = new Object[2];
                         DataTransferpolice[0] = MainActivity.mMap;
@@ -83,6 +103,11 @@ public class BottomNavigationViewHelper {
 
                         Log.d("onClick", "Button is Clicked");
                         MainActivity.mMap.clear();
+                        MainActivity.markerAlready = false;
+
+                        MainActivity.placeAutoComplete.setText("Restaurants near me");
+                        locate(MainActivity.location);
+
                         String urlrestaurant = getUrl(MainActivity.l.getLatitude(), MainActivity.l.getLongitude(), Restaurant);
                         Object[] DataTransferrestaurant = new Object[2];
                         DataTransferrestaurant[0] = MainActivity.mMap;
@@ -111,4 +136,40 @@ public class BottomNavigationViewHelper {
         Log.d("getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
     }
+
+    public static void locate(Location location) {
+        if (location != null) {
+            double lng = location.getLongitude();
+            double lat = location.getLatitude();
+
+            CameraPosition camPosition = new CameraPosition.Builder()
+                    .target(new LatLng(lat, lng)).zoom(12f).build();
+
+            if (MainActivity.mMap != null) {
+                MainActivity.mMap.animateCamera(CameraUpdateFactory
+                        .newCameraPosition(camPosition));
+            } else {
+                Log.d("Location error", "Something went wrong");
+            }
+
+
+            final MarkerOptions mMarkerOptions = new MarkerOptions();
+            mMarkerOptions.position(new LatLng(lat, lng));
+            mMarkerOptions.icon(BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_location));
+
+           final Marker m =  MainActivity.mMap.addMarker(mMarkerOptions);
+
+            CircleOptions mOptions;
+            Circle c;
+
+
+            mOptions = new CircleOptions()
+                    .center(new LatLng(lat, lng)).radius(5000)
+                    .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
+
+            c = MainActivity.mMap.addCircle(mOptions);
+        }
+    }
+
 }
