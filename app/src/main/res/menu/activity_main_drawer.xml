@@ -35,6 +35,11 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="Feedback" />
 
+            <item
+                android:id="@+id/tandc"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Terms And Conditions" />
+
         </menu>
     </item>
 

@@ -18,22 +18,39 @@
         android:layout_marginEnd="50dp"
         />
 
-    <fragment
-        android:id="@+id/place_autocomplete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
-        />
+
 
     <fragment
         android:id="@+id/map"
-        android:layout_below="@id/place_autocomplete"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
 
         android:layout_height="match_parent"
         android:layout_marginBottom="50dp"
         tools:context=".HomeActivity" />
+
+    <com.arlib.floatingsearchview.FloatingSearchView
+        android:id="@+id/floating_search_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:floatingSearch_searchBarMarginLeft="10dp"
+        app:floatingSearch_searchBarMarginTop="10dp"
+        android:clickable="false"
+        app:floatingSearch_searchBarMarginRight="10dp"
+        app:floatingSearch_suggestionsListAnimDuration="250"
+        app:floatingSearch_showSearchKey="false"
+        app:floatingSearch_leftActionMode="noLeftAction"
+        app:floatingSearch_close_search_on_keyboard_dismiss="true"/>
+
+    <fragment
+        android:id="@+id/place_autocomplete"
+        android:layout_width="match_parent"
+        android:layout_marginTop="14dp"
+        android:layout_centerHorizontal="true"
+        android:layout_height="50dp"
+        android:layout_alignParentTop="true"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        />
 
     <mehdi.sakout.fancybuttons.FancyButton
         android:layout_width="match_parent"
