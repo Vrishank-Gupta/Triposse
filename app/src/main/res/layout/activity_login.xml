@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:background="@drawable/background_gradient"
+    tools:context="com.vrishankgupta.triposse.LoginActivity">
+
+    <include layout="@layout/app_bar_layout"
+        android:id="@+id/main_app_bar"/>
+
+
+    <TextView
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="Log In"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="55dp"/>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="270dp"
+        android:backgroundTint="#ffd900"
+        android:textColorHint="#ffffff"
+        android:layout_marginTop="70dp"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etEmail"
+            android:textColorHint="#ffffff"
+            android:drawablePadding="10dp"
+            android:drawableLeft="@drawable/drawable_size"
+            android:paddingBottom="20dp"
+            android:backgroundTint="#ffd900"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Name" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="270dp"
+        android:backgroundTint="#ffd900"
+        android:textColorHint="#ffffff"
+        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/etPassword"
+            android:drawablePadding="10dp"
+            android:paddingBottom="20dp"
+            android:textColorHint="#ffffff"
+            android:drawableLeft="@drawable/drawable_password_size"
+            android:layout_width="match_parent"
+            android:backgroundTint="#ffd900"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Password" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <Button
+        android:layout_width="270dp"
+        android:text="Login"
+        android:id="@+id/btnLogin"
+        android:padding="12dp"
+        android:textColor="#ffffff"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70dp"
+        android:background="@drawable/rounded_button"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="First Time Here?"
+            android:textColor="#ffffff"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign Up"
+            android:layout_marginLeft="7dp"
+            android:textColor="#b3b8fc"
+            android:textStyle="italic"/>
+
+    </LinearLayout>
+
+</LinearLayout>
