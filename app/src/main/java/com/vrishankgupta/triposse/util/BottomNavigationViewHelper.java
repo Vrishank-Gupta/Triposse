@@ -1,14 +1,12 @@
 package com.vrishankgupta.triposse.util;
 
 import android.content.Context;
-import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -22,8 +20,6 @@ import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.vrishankgupta.triposse.MainActivity;
 import com.vrishankgupta.triposse.Nearby_Places.GetNearbyPlacesData;
 import com.vrishankgupta.triposse.R;
-
-import java.util.logging.Handler;
 
 public class BottomNavigationViewHelper {
 
@@ -179,7 +175,6 @@ public class BottomNavigationViewHelper {
             };
 
             android.os.Handler h = new android.os.Handler();
-
             h.postDelayed(r,10000);
         }
     }
