@@ -6,11 +6,13 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class LoginActivity extends AppCompatActivity {
 
     private Toolbar mToolbar;
     private Button btnLogin;
+    private TextView tvSignUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i  = new Intent(LoginActivity.this , MainActivity.class);
                 startActivity(i);
+            }
+        });
+
+        tvSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent j  = new Intent(LoginActivity.this , SignUpActivity.class);
+                startActivity(j);
             }
         });
     }
