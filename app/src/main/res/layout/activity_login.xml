@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
+    android:fitsSystemWindows="true"
     android:gravity="center_horizontal"
     android:background="@drawable/background_gradient"
     tools:context="com.vrishankgupta.triposse.LoginActivity">
@@ -96,6 +97,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sign Up"
+            android:id="@+id/tvSignUp"
             android:layout_marginLeft="7dp"
             android:textColor="#b3b8fc"
             android:textStyle="italic"/>
