@@ -14,6 +14,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -68,8 +69,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     public static GoogleMap mMap;
-   public boolean flag = false;
-   public static  boolean markerAlready = false;
+    public boolean flag = false;
+    public static  boolean markerAlready = false;
     public static PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
     private String provider = null;
@@ -280,18 +281,37 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.myProfile) {
+        if (id == R.id.myProfile)
+        {
             // Handle the camera action
 
-        } else if (id == R.id.myTrips) {
+        }
 
-        } else if (id == R.id.fir) {
+        else if (id == R.id.myTrips)
+        {
 
-        } else if (id == R.id.logout) {
+        }
 
-        } else if (id == R.id.contactus) {
+        else if (id == R.id.fir)
+        {
+            String url = "http://www.fironline.org";
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
 
-        } else if (id == R.id.feedback) {
+        else if (id == R.id.logout)
+        {
+
+        }
+
+        else if (id == R.id.contactus)
+        {
+
+        }
+
+        else if (id == R.id.feedback)
+        {
 
         }
 
