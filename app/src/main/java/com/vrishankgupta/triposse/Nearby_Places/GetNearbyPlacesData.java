@@ -8,6 +8,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.vrishankgupta.triposse.MainActivity;
+import com.vrishankgupta.triposse.R;
 
 import java.util.HashMap;
 import java.util.List;
@@ -51,12 +53,20 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
             Log.d("onPostExecute","Entered into showing locations");
             MarkerOptions markerOptions = new MarkerOptions();
+            MarkerOptions loc = new MarkerOptions();
             HashMap<String, String> googlePlace = nearbyPlacesList.get(i);
             double lat = Double.parseDouble(googlePlace.get("lat"));
             double lng = Double.parseDouble(googlePlace.get("lng"));
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
             LatLng latLng = new LatLng(lat, lng);
+            loc.position(new LatLng(MainActivity.l.getLatitude(),MainActivity.l.getLongitude()));
+            loc.title("Current Location");
+            loc.icon(BitmapDescriptorFactory
+                    .fromResource(R.drawable.ic_location));
+            mMap.addMarker(loc);
+
+
             markerOptions.position(latLng);
             markerOptions.title(placeName + " : " + vicinity);
             mMap.addMarker(markerOptions);

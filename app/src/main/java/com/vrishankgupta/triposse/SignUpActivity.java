@@ -21,6 +21,7 @@ public class SignUpActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        btnSignUp = findViewById(R.id.btnSignup);
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override

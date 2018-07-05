@@ -55,7 +55,6 @@ public class BottomNavigationViewHelper {
 
                         Log.d("onClick", "Button is Clicked");
                         MainActivity.mMap.clear();
-                        locate(MainActivity.location);
                         MainActivity.markerAlready = false;
                         MainActivity.placeAutoComplete.setText("Hospitals near me");
                         String urlhospital = getUrl(MainActivity.l.getLatitude(), MainActivity.l.getLongitude(), Hospital);
@@ -75,7 +74,6 @@ public class BottomNavigationViewHelper {
 
                         Log.d("onClick", "Button is Clicked");
                         MainActivity.mMap.clear();
-                        locate(MainActivity.location);
                         MainActivity.markerAlready = false;
 
                         MainActivity.placeAutoComplete.setText("Police Stations near me");
@@ -102,8 +100,6 @@ public class BottomNavigationViewHelper {
                         MainActivity.markerAlready = false;
 
                         MainActivity.placeAutoComplete.setText("Restaurants near me");
-                        locate(MainActivity.location);
-
                         String urlrestaurant = getUrl(MainActivity.l.getLatitude(), MainActivity.l.getLongitude(), Restaurant);
                         Object[] DataTransferrestaurant = new Object[2];
                         DataTransferrestaurant[0] = MainActivity.mMap;
@@ -128,55 +124,9 @@ public class BottomNavigationViewHelper {
         googlePlacesUrl.append("&radius=" + 10000);
         googlePlacesUrl.append("&type=" + nearbyPlace);
         googlePlacesUrl.append("&sensor=true");
-        googlePlacesUrl.append("&key=" + "AIzaSyATuUiZUkEc_UgHuqsBJa1oqaODI-3mLs0");
+        googlePlacesUrl.append("&key=" + "AIzaSyCE7i9MJ3YuDuqy9cn4YqgSf-qDESbgXh4");
         Log.d("getUrl", googlePlacesUrl.toString());
         return (googlePlacesUrl.toString());
-    }
-
-    public static void locate(Location location) {
-        if (location != null) {
-            double lng = location.getLongitude();
-            double lat = location.getLatitude();
-
-            CameraPosition camPosition = new CameraPosition.Builder()
-                    .target(new LatLng(lat, lng)).zoom(12f).build();
-
-            if (MainActivity.mMap != null) {
-                MainActivity.mMap.animateCamera(CameraUpdateFactory
-                        .newCameraPosition(camPosition));
-            } else {
-                Log.d("Location error", "Something went wrong");
-            }
-
-
-            final MarkerOptions mMarkerOptions = new MarkerOptions();
-            mMarkerOptions.position(new LatLng(lat, lng));
-            mMarkerOptions.icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.ic_location));
-
-           final Marker m =  MainActivity.mMap.addMarker(mMarkerOptions);
-
-            CircleOptions mOptions;
-            final Circle c;
-
-
-            mOptions = new CircleOptions()
-                    .center(new LatLng(lat, lng)).radius(5000)
-                    .strokeColor(0x110000FF).strokeWidth(1).fillColor(0x110000FF);
-
-            c = MainActivity.mMap.addCircle(mOptions);
-
-            Runnable r = new Runnable() {
-                @Override
-                public void run() {
-                    m.remove();
-                    c.remove();
-                }
-            };
-
-            android.os.Handler h = new android.os.Handler();
-            h.postDelayed(r,10000);
-        }
     }
 
 }
