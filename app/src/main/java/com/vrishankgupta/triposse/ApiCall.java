@@ -30,13 +30,47 @@ public class ApiCall extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_api_call);
 
-        new mytask().execute();
+        new getTask().execute("http://192.168.1.5:3000/users/profile");
     }
 
 
+    class getTask extends AsyncTask<String,Void,String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            URL url = null;
+            try {
+                url = new URL(params[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            try {
+                HttpURLConnection urlConnection;
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjViM2U0NDBjOGM0YjBhYWEzNTYzNzhkNyIsIm5hbWUiOiJ2aXNodSIsImVtYWlsIjoidnJpc2hhbms5OEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InZpc2h1MTIzIiwicGFzc3dvcmQiOiIkMmEkMTAkSXB4clA0WDlyUlZ5d09SaXkxYUF3ZUVlbGxleWJpMTFkc2dkTlpRelEyLzA5bGR0NG9hQ08iLCJfX3YiOjB9LCJpYXQiOjE1MzA4ODc2MTAsImV4cCI6MTUzMTQ5MjQxMH0.p_PhxoBUtR4XlXoOo179NT2VqnFEtcQGHCjbJ2vcSvw");
+                InputStream inputStream = urlConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String s = bufferedReader.readLine();
+                bufferedReader.close();
+                return s;
+
+            } catch (IOException e) {
+                Log.e("Error: ", e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("APICALL", s);
+
+            new postTask().execute();
+        }
+    }
 
 
-    class mytask extends AsyncTask<String,Void,String>
+    class postTask extends AsyncTask<String,Void,String>
     {
         protected void onPreExecute(){}
 
@@ -44,16 +78,15 @@ public class ApiCall extends AppCompatActivity {
 
             try {
 
-                URL url = new URL("http://192.168.43.189:3000/users/authenticate");
-
+                URL url = new URL("http://192.168.1.5:3000/users/authenticate");
                 JSONObject postDataParams = new JSONObject();
                 postDataParams.put("username", "vishu123");
                 postDataParams.put("password", "123456789");
                 Log.e("params",postDataParams.toString());
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setReadTimeout(15000 /* milliseconds */);
-                conn.setConnectTimeout(15000 /* milliseconds */);
+                conn.setReadTimeout(15000);
+                conn.setConnectTimeout(15000);
                 conn.setRequestMethod("POST");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
@@ -79,14 +112,11 @@ public class ApiCall extends AppCompatActivity {
                     String line="";
 
                     while((line = in.readLine()) != null) {
-
                         sb.append(line);
                         break;
                     }
-
                     in.close();
                     return sb.toString();
-
                 }
                 else {
                     return new String("false : "+responseCode);
@@ -95,7 +125,6 @@ public class ApiCall extends AppCompatActivity {
             catch(Exception e){
                 return new String("Exception: " + e.getMessage());
             }
-
         }
 
         @Override
@@ -107,7 +136,6 @@ public class ApiCall extends AppCompatActivity {
     }
 
     public String getPostDataString(JSONObject params) throws Exception {
-
         StringBuilder result = new StringBuilder();
         boolean first = true;
 
@@ -126,7 +154,6 @@ public class ApiCall extends AppCompatActivity {
             result.append(URLEncoder.encode(key, "UTF-8"));
             result.append("=");
             result.append(URLEncoder.encode(value.toString(), "UTF-8"));
-
         }
         return result.toString();
     }
