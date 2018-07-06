@@ -52,6 +52,7 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
     private void ShowNearbyPlaces(List<HashMap<String, String>> nearbyPlacesList) {
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
             Log.d("onPostExecute","Entered into showing locations");
+            Log.d("nearbyData", nearbyPlacesList.get(i).toString());
             MarkerOptions markerOptions = new MarkerOptions();
             MarkerOptions loc = new MarkerOptions();
             HashMap<String, String> googlePlace = nearbyPlacesList.get(i);
@@ -62,9 +63,12 @@ public class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
             LatLng latLng = new LatLng(lat, lng);
             loc.position(new LatLng(MainActivity.l.getLatitude(),MainActivity.l.getLongitude()));
             loc.title("Current Location");
+
             loc.icon(BitmapDescriptorFactory
                     .fromResource(R.drawable.ic_location));
-            mMap.addMarker(loc);
+
+                mMap.addMarker(loc);
+                MainActivity.mMarkerOptions.visible(false);
 
 
             markerOptions.position(latLng);

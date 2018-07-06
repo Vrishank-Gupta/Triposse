@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
 
     public static GoogleMap mMap;
+    public static MarkerOptions mMarkerOptions;;
     public boolean flag = false;
     public static  boolean markerAlready = false;
     public static PlaceAutocompleteFragment placeAutoComplete;
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = findViewById(R.id.btnGuide);
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Opens guides's details!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this,ApiCall.class));
 
             }
         });
@@ -434,7 +437,8 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        MarkerOptions mMarkerOptions = new MarkerOptions();
+
+        mMarkerOptions = new MarkerOptions();
         mMarkerOptions.position(new LatLng(lat, lang));
         mMarkerOptions.icon(BitmapDescriptorFactory
                 .fromResource(R.drawable.ic_location));
