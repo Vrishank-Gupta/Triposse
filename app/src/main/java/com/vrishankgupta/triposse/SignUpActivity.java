@@ -1,5 +1,8 @@
 package com.vrishankgupta.triposse;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +17,7 @@ import com.google.gson.Gson;
 import com.vrishankgupta.triposse.util.Dob;
 import com.vrishankgupta.triposse.util.User;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -201,9 +205,35 @@ public class SignUpActivity extends AppCompatActivity {
                     Toast.LENGTH_LONG).show();
             Log.d("APICALL", result);
 
+            try {
+                JSONObject ans = new JSONObject(result);
+                if(ans.getString("success").equals("true"))
+                {
+                    token = ans.getString("token");
+                    saveandcontinue();
+                }
 
+                else
+                    Toast.makeText(SignUpActivity.this, "SignUp Failed", Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
         }
+    }
+
+    private void saveandcontinue()
+    {
+        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preference), MODE_PRIVATE).edit();
+        editor.putString("token",token);
+        editor.apply();
+
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.preference),MODE_PRIVATE);
+        String restoredText = preferences.getString("token", null);
+        Log.d("pref", "saveandcontinue: "+ restoredText);
+
+        startActivity(new Intent(SignUpActivity.this,MainActivity.class));
+
     }
 
     public String getPostDataString(JSONObject params) throws Exception {
@@ -221,7 +251,6 @@ public class SignUpActivity extends AppCompatActivity {
                 first = false;
             else
                 result.append("&");
-
             result.append(URLEncoder.encode(key, "UTF-8"));
             result.append("=");
             result.append(URLEncoder.encode(value.toString(), "UTF-8"));
