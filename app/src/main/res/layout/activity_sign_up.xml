@@ -102,7 +102,8 @@
                     android:paddingBottom="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="* COUNTRY" />
+                    android:hint="* NATIONALITY"
+                    />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -186,7 +187,7 @@
                 android:textColor="#ffffff"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="SIGN UP"
+                android:text="Validate"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
         </LinearLayout>

@@ -5,20 +5,21 @@ public class User{
 	private String password;
 	private String address;
 	private Dob dob;
-	private String passportNumber;
+	private String passport_number;
 	private String email;
-	private String contactNumber;
+	private String contact_number;
 	private String username;
 
+	
 	public User(String country, String password, String address, Dob dob, String passportNumber, String email, String contactNumber, String username)
-    {
+	{
 		this.country = country;
 		this.password = password;
 		this.address = address;
 		this.dob = dob;
-		this.passportNumber = passportNumber;
+		this.passport_number = passportNumber;
 		this.email = email;
-		this.contactNumber = contactNumber;
+		this.contact_number = contactNumber;
 		this.username = username;
 	}
 
@@ -55,11 +56,11 @@ public class User{
 	}
 
 	public void setPassportNumber(String passportNumber){
-		this.passportNumber = passportNumber;
+		this.passport_number = passportNumber;
 	}
 
 	public String getPassportNumber(){
-		return passportNumber;
+		return passport_number;
 	}
 
 	public void setEmail(String email){
@@ -71,11 +72,11 @@ public class User{
 	}
 
 	public void setContactNumber(String contactNumber){
-		this.contactNumber = contactNumber;
+		this.contact_number = contactNumber;
 	}
 
 	public String getContactNumber(){
-		return contactNumber;
+		return contact_number;
 	}
 
 	public void setUsername(String username){
@@ -94,9 +95,9 @@ public class User{
 			",password = '" + password + '\'' + 
 			",address = '" + address + '\'' + 
 			",dob = '" + dob + '\'' + 
-			",passport_number = '" + passportNumber + '\'' + 
+			",passport_number = '" + passport_number + '\'' + 
 			",email = '" + email + '\'' + 
-			",contact_number = '" + contactNumber + '\'' + 
+			",contact_number = '" + contact_number + '\'' +
 			",username = '" + username + '\'' + 
 			"}";
 		}
