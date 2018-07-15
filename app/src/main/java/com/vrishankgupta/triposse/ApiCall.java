@@ -30,11 +30,12 @@ public class ApiCall extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_api_call);
 
-        new getTask().execute("http://192.168.1.5:3000/users/profile");
+
+        new ProfileGetTask().execute("http://192.168.1.5:3000/helplines/getData/celhi");
     }
 
 
-    class getTask extends AsyncTask<String,Void,String>
+    class ProfileGetTask extends AsyncTask<String,Void,String>
     {
         @Override
         protected String doInBackground(String... params) {
@@ -64,13 +65,13 @@ public class ApiCall extends AppCompatActivity {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             Log.d("APICALL", s);
-
-            new postTask().execute();
+ 
+            new AuthenticatePostTask().execute();
         }
     }
 
 
-    class postTask extends AsyncTask<String,Void,String>
+    class AuthenticatePostTask extends AsyncTask<String,Void,String>
     {
         protected void onPreExecute(){}
 
@@ -90,7 +91,6 @@ public class ApiCall extends AppCompatActivity {
                 conn.setRequestMethod("POST");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
-
                 OutputStream os = conn.getOutputStream();
                 BufferedWriter writer = new BufferedWriter(
                         new OutputStreamWriter(os, "UTF-8"));
