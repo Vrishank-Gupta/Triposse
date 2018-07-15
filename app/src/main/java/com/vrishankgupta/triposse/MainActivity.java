@@ -5,6 +5,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -15,6 +16,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -58,7 +60,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.ittianyu.bottomnavigationviewex.BottomNavigationViewEx;
 import com.vrishankgupta.triposse.util.BottomNavigationViewHelper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -74,10 +82,9 @@ public class MainActivity extends AppCompatActivity
     public static  boolean markerAlready = false;
     public static PlaceAutocompleteFragment placeAutoComplete;
     private LocationManager mLocationManager = null;
-    private String provider = null;
+    private String provider = null,token;
     Circle c;
-    private Marker mCurrentPosition = null;
-    Marker marker;
+    private Marker mCurrentPosition = null,marker;
     public static Location location;
     CircleOptions mOptions;
     public static Location l;
@@ -100,7 +107,8 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Toast.makeText(MainActivity.this, "Opens guides's details!", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(MainActivity.this,ApiCall.class));
+//                startActivity(new Intent(MainActivity.this,ApiCall.class));
+                showUserData();
 
             }
         });
@@ -125,6 +133,53 @@ public class MainActivity extends AppCompatActivity
             );
         }
     }
+
+    //region user data
+    private void showUserData()
+    {
+        SharedPreferences preferences = getSharedPreferences(getString(R.string.preference),MODE_PRIVATE);
+
+        token = preferences.getString("token", null);
+        Log.d("pref", "saveandcontinue: "+ token);
+
+        new ProfileGetTask().execute("http://192.168.1.5:3000/users/profile");
+    }
+
+    class ProfileGetTask extends AsyncTask<String,Void,String>
+    {
+        @Override
+        protected String doInBackground(String... params) {
+            URL url = null;
+            try {
+                url = new URL(params[0]);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            try {
+                HttpURLConnection urlConnection;
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestProperty("Authorization",token);
+                InputStream inputStream = urlConnection.getInputStream();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                String s = bufferedReader.readLine();
+                bufferedReader.close();
+                return s;
+
+            } catch (IOException e) {
+                Log.e("Error: ", e.getMessage(), e);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("profile", s);
+        }
+    }
+
+    //endregion
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

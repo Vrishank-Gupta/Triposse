@@ -1,6 +1,5 @@
 package com.vrishankgupta.triposse;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -158,8 +157,6 @@ public class SignUpActivity extends AppCompatActivity {
                 Log.e("params",postDataParams.toString());
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                conn.setReadTimeout(150000);
-//                conn.setConnectTimeout(150000);
                 conn.setRequestMethod("POST");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
