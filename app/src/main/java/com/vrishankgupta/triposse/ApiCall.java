@@ -48,7 +48,8 @@ public class ApiCall extends AppCompatActivity {
             try {
                 HttpURLConnection urlConnection;
                 urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestProperty("Authorization","Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Il9pZCI6IjViM2U0NDBjOGM0YjBhYWEzNTYzNzhkNyIsIm5hbWUiOiJ2aXNodSIsImVtYWlsIjoidnJpc2hhbms5OEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InZpc2h1MTIzIiwicGFzc3dvcmQiOiIkMmEkMTAkSXB4clA0WDlyUlZ5d09SaXkxYUF3ZUVlbGxleWJpMTFkc2dkTlpRelEyLzA5bGR0NG9hQ08iLCJfX3YiOjB9LCJpYXQiOjE1MzA4ODc2MTAsImV4cCI6MTUzMTQ5MjQxMH0.p_PhxoBUtR4XlXoOo179NT2VqnFEtcQGHCjbJ2vcSvw");
+                urlConnection.setRequestProperty("id","pratyush");
+                urlConnection.setRequestProperty("password","password");
                 InputStream inputStream = urlConnection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String s = bufferedReader.readLine();
@@ -66,7 +67,7 @@ public class ApiCall extends AppCompatActivity {
             super.onPostExecute(s);
             Log.d("APICALL", s);
  
-            new AuthenticatePostTask().execute();
+//            new AuthenticatePostTask().execute();
         }
     }
 

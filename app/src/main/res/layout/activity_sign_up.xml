@@ -61,6 +61,24 @@
                 android:layout_marginLeft="10dp">
 
                 <android.support.design.widget.TextInputEditText
+                    android:id="@+id/password"
+                    android:backgroundTint="#ffd900"
+                    android:inputType="textPassword"
+                    android:paddingBottom="20dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="* PASSWORD" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:backgroundTint="#ffd900"
+                android:textColorHint="#ffffff"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp">
+
+                <android.support.design.widget.TextInputEditText
                     android:inputType="date"
                     android:backgroundTint="#ffd900"
                     android:paddingBottom="20dp"
@@ -155,23 +173,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="* PASSPORT NUMBER" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:backgroundTint="#ffd900"
-                android:textColorHint="#ffffff"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp">
-
-                <android.support.design.widget.TextInputEditText
-                    android:id="@+id/Login_Refercode"
-                    android:backgroundTint="#ffd900"
-                    android:paddingBottom="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="REFER CODE(OPTIONAL)" />
 
             </android.support.design.widget.TextInputLayout>
 

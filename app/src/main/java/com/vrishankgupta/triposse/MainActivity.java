@@ -92,6 +92,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         button = findViewById(R.id.btnGuide);
 
+
+        /**
+         * API CALLING FOR TEST
+         **/
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
