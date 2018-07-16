@@ -27,7 +27,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -128,7 +127,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             ActivityCompat.requestPermissions(
                     MainActivity.this,
-                    new String[] {Manifest.permission.ACCESS_COARSE_LOCATION},
+                    new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},
                     44
             );
         }
@@ -140,7 +139,7 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences preferences = getSharedPreferences(getString(R.string.preference),MODE_PRIVATE);
 
         token = preferences.getString("token", null);
-        Log.d("pref", "saveandcontinue: "+ token);
+        Log.d("Results", "profileToken : "+ token);
 
         new ProfileGetTask().execute("http://192.168.1.5:3000/users/profile");
     }
@@ -174,7 +173,7 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            Log.d("profile", s);
+            Log.d("Results ","ProfileGet" + s);
         }
     }
 
@@ -345,7 +344,6 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.myProfile)
         {
-            // Handle the camera action
 
         }
 
@@ -364,10 +362,31 @@ public class MainActivity extends AppCompatActivity
 
         else if (id == R.id.logout)
         {
-            SharedPreferences rem= getSharedPreferences(getString(R.string.preference), MODE_PRIVATE);
-            rem.edit().remove("token").apply();
-            startActivity(new Intent(MainActivity.this,LoginActivity.class));
-            finish();
+
+            new MaterialDialog.Builder(this)
+                    .title("Are you sure you want to logout?")
+                    .positiveText("Yes, Logout")
+                    .negativeText("No, Thanks!")
+                    .cancelable(false)
+                    .positiveColor(Color.rgb(232,42,42))
+                    .negativeColor(Color.rgb(232,42,42))
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            SharedPreferences rem= getSharedPreferences(getString(R.string.preference), MODE_PRIVATE);
+                            rem.edit().remove("token").apply();
+                            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                            finish();
+                        }
+                    })
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .show();
+
         }
 
         else if (id == R.id.contactus)
@@ -488,7 +507,7 @@ public class MainActivity extends AppCompatActivity
             List<Address> myList = myLocation.getFromLocation(lat,lang, 1);
             Address address;
             address = (Address) myList.get(0);
-
+            Log.d("KKK", address.getLocality() + String.valueOf(lang) +" "+ String.valueOf(lat)) ;
 
             Log.d("LOCC", address.getAddressLine(0));
 

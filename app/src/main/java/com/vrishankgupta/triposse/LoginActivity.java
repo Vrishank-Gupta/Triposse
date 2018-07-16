@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +44,8 @@ public class LoginActivity extends AppCompatActivity {
         tvSignUp = findViewById(R.id.tvSignUp);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+
+
 
         mToolbar = findViewById(R.id.main_app_bar);
         setSupportActionBar(mToolbar);
@@ -108,7 +111,7 @@ public class LoginActivity extends AppCompatActivity {
                 JSONObject postDataParams = new JSONObject();
                 postDataParams.put("username", etEmail.getText().toString());
                 postDataParams.put("password", etPassword.getText().toString());
-                Log.e("params",postDataParams.toString());
+                Log.e("Results: ","AuthSentData: "+postDataParams.toString());
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
@@ -154,11 +157,15 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             try {
                 JSONObject ans = new JSONObject(result);
+                Log.d("Results", "Authenticate: "+result);
                 if(ans.getString("success").equals("true"))
                 {
                     token = ans.getString("token");
                     saveandcontinue();
                 }
+
+                else
+                    Toast.makeText(LoginActivity.this, "Invalid ID or Password!", Toast.LENGTH_SHORT).show();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -177,7 +184,7 @@ public class LoginActivity extends AppCompatActivity {
 
         SharedPreferences preferences = getSharedPreferences(getString(R.string.preference),MODE_PRIVATE);
         String restoredText = preferences.getString("token", null);
-        Log.d("pref", "saveandcontinue: "+ restoredText);
+        Log.d("Results", "TokenOnAuth: "+ restoredText);
 
         startActivity(new Intent(LoginActivity.this,MainActivity.class));
         finish();
