@@ -364,7 +364,10 @@ public class MainActivity extends AppCompatActivity
 
         else if (id == R.id.logout)
         {
-
+            SharedPreferences rem= getSharedPreferences(getString(R.string.preference), MODE_PRIVATE);
+            rem.edit().remove("token").apply();
+            startActivity(new Intent(MainActivity.this,LoginActivity.class));
+            finish();
         }
 
         else if (id == R.id.contactus)
