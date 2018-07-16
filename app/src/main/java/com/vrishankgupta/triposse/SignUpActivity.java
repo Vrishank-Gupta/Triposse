@@ -1,10 +1,21 @@
 package com.vrishankgupta.triposse;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -59,12 +70,47 @@ public class SignUpActivity extends AppCompatActivity {
 
 
 
+
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                int perm = ContextCompat.checkSelfPermission(
+                        SignUpActivity.this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION);
+
+                if (perm == PackageManager.PERMISSION_GRANTED) {
+                    checkValidity();
+                    }
+
+                    else {
+                    ActivityCompat.requestPermissions(
+                            SignUpActivity.this,
+                            new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},
+                            44
+                    );
+                }
+
+
+
                 checkValidity();
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+
+        if (requestCode == 44) { //write request
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkValidity();
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
+            Toast.makeText(SignUpActivity.this, "Go to Settings and Grant the permission to use this feature.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 
@@ -117,6 +163,7 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void registerUser()
     {
         String date = dob.getText().toString().substring(0,1);
@@ -124,6 +171,15 @@ public class SignUpActivity extends AppCompatActivity {
         String year = dob.getText().toString().substring(4);
 
         Dob dob = new Dob(date,month,year);
+        TelephonyManager tel = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+        String imei;
+        if (android.os.Build.VERSION.SDK_INT >= 26) {
+            imei=tel.getImei();
+        }
+        else
+        {
+            imei=tel.getDeviceId();
+        }
 
         User user;
         user = new User(
@@ -134,10 +190,13 @@ public class SignUpActivity extends AppCompatActivity {
                 passport.getText().toString(),
                 email.getText().toString(),
                 number.getText().toString(),
-                userName.getText().toString()
+                userName.getText().toString(),
+                imei
         );
 
         jsonUser = new Gson().toJson(user);
+        Log.d("Results ", "registerUser: " + jsonUser);
+        Log.d("imei", "registerUser: " + imei);
 
         new RegisterTask().execute();
     }
@@ -200,7 +259,7 @@ public class SignUpActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
             Toast.makeText(getApplicationContext(), result,
                     Toast.LENGTH_LONG).show();
-            Log.d("APICALL", result);
+            Log.d("Results", "Register "+result);
 
             try {
                 JSONObject ans = new JSONObject(result);
