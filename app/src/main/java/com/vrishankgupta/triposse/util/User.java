@@ -10,7 +10,8 @@ public class User{
 	private String contact_number;
 	private String username;
 	private String imei;
-	public User(String country, String password, String address, Dob dob, String passportNumber, String email, String contactNumber, String username, String imei)
+	private String image;
+	public User(String country, String password, String address, Dob dob, String passportNumber, String email, String contactNumber, String username, String imei,String image)
 	{
 		this.country = country;
 		this.password = password;
@@ -21,24 +22,35 @@ public class User{
 		this.contact_number = contactNumber;
 		this.username = username;
 		this.imei = imei;
+		this.image = image;
+
 	}
 
-	@Override
-	public String toString() {
-		return "User{" +
-				"country='" + country + '\'' +
-				", password='" + password + '\'' +
-				", address='" + address + '\'' +
-				", dob=" + dob +
-				", passport_number='" + passport_number + '\'' +
-				", email='" + email + '\'' +
-				", contact_number='" + contact_number + '\'' +
-				", username='" + username + '\'' +
-				", imei='" + imei + '\'' +
-				'}';
-	}
+    @Override
+    public String toString() {
+        return "User{" +
+                "country='" + country + '\'' +
+                ", password='" + password + '\'' +
+                ", address='" + address + '\'' +
+                ", dob=" + dob +
+                ", passport_number='" + passport_number + '\'' +
+                ", email='" + email + '\'' +
+                ", contact_number='" + contact_number + '\'' +
+                ", username='" + username + '\'' +
+                ", imei='" + imei + '\'' +
+                ", image='" + image + '\'' +
+                '}';
+    }
 
-	public String getCountry() {
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getCountry() {
 		return country;
 	}
 

@@ -1,7 +1,21 @@
 package com.vrishankgupta.triposse;
 
 import android.Manifest;
-
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +33,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.vrishankgupta.triposse.util.Dob;
 import com.vrishankgupta.triposse.util.User;
+
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,6 +72,7 @@ public class SignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
 
         ivProfImage = findViewById(R.id.ivProfileImage);
         tvChangeProfImage = findViewById(R.id.tvAddProfImage);
@@ -111,21 +127,6 @@ public class SignUpActivity extends AppCompatActivity {
                 selectImage();
             }
         });
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-
-        if (requestCode == 44) { //write request
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkValidity();
-            }
-        }
-        else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
-            Toast.makeText(SignUpActivity.this, "Go to Settings and Grant the permission to use this feature.", Toast.LENGTH_SHORT).show();
-        }
     }
 
 
@@ -187,6 +188,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         Dob dob = new Dob(date,month,year);
         TelephonyManager tel = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+
         String imei;
         if (android.os.Build.VERSION.SDK_INT >= 26) {
             imei=tel.getImei();
@@ -206,12 +208,15 @@ public class SignUpActivity extends AppCompatActivity {
                 email.getText().toString(),
                 number.getText().toString(),
                 userName.getText().toString(),
-                imei
+                imei,
+                "Hhhhhhhhhhh"
         );
 
         jsonUser = new Gson().toJson(user);
+
         Log.d("Results ", "registerUser: " + jsonUser);
-        Log.d("imei", "registerUser: " + imei);
+//        Log.d("imei", "registerUser: " + imei);
+//        Log.d("imgurl", "registerUser: " + imageURL);
 
         new RegisterTask().execute();
     }
@@ -228,8 +233,6 @@ public class SignUpActivity extends AppCompatActivity {
                 URL url = new URL("http://192.168.1.5:3000/users/register");
                 JSONObject postDataParams = new JSONObject(jsonUser);
                 Log.d("Hola", "registerUser:"+postDataParams.toString());
-                Log.e("params",postDataParams.toString());
-
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setDoInput(true);
@@ -272,20 +275,24 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Toast.makeText(getApplicationContext(), result,
-                    Toast.LENGTH_LONG).show();
-            Log.d("Results", "Register "+result);
+//            Toast.makeText(getApplicationContext(), result,
+//                    Toast.LENGTH_LONG).show();
+//            Log.d("Results", "Register "+result);
 
             try {
+
                 JSONObject ans = new JSONObject(result);
                 if(ans.getString("success").equals("true"))
                 {
                     token = ans.getString("token");
+                    Log.d("hogya", "onPostExecute: ");
                     saveandcontinue();
                 }
 
-                else
+                else {
                     Toast.makeText(SignUpActivity.this, "SignUp Failed", Toast.LENGTH_SHORT).show();
+                    Log.d("nhihua", "onPostExecute: ");
+                }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -329,7 +336,7 @@ public class SignUpActivity extends AppCompatActivity {
         return result.toString();
     }
 
-    //---------------------SHIVAM'S NEW CODE ---------------------------------------------------
+    //-------------------------SHIVAM'S NEW CODE ---------------------------------------------------  iske neeche for image to string
 
     private void selectImage() {
         final CharSequence[] items = { "Take Photo", "Choose from Library",
@@ -408,6 +415,15 @@ public class SignUpActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        if (requestCode == 44) { //write request
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkValidity();
+            }
+        }
+        else if (Build.VERSION.SDK_INT >= 23 && !shouldShowRequestPermissionRationale(permissions[0])) {
+            Toast.makeText(SignUpActivity.this, "Go to Settings and Grant the permission to use this feature.", Toast.LENGTH_SHORT).show();
+        }
         switch (requestCode) {
             case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -436,7 +452,8 @@ public class SignUpActivity extends AppCompatActivity {
     @SuppressWarnings("deprecation")
     private void onSelectFromGalleryResult(Intent data) {
         Bitmap bm=null;
-        if (data != null) {
+        if (data != null)
+        {
             try {
                 bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
             } catch (IOException e) {
@@ -466,7 +483,6 @@ public class SignUpActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         ivProfImage.setImageBitmap(thumbnail);
-
         imageURL = BitMapToString(thumbnail);
     }
 
@@ -477,6 +493,4 @@ public class SignUpActivity extends AppCompatActivity {
         String temp= Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
     }
-
-
 }
