@@ -101,7 +101,7 @@ public class SignUpActivity extends AppCompatActivity {
 
                 int perm = ContextCompat.checkSelfPermission(
                         SignUpActivity.this,
-                        Manifest.permission.ACCESS_COARSE_LOCATION);
+                        Manifest.permission.READ_EXTERNAL_STORAGE);
 
                 if (perm == PackageManager.PERMISSION_GRANTED) {
                     checkValidity();
@@ -117,7 +117,7 @@ public class SignUpActivity extends AppCompatActivity {
 
 
 
-                checkValidity();
+//                checkValidity();
             }
         });
 
@@ -224,7 +224,9 @@ public class SignUpActivity extends AppCompatActivity {
 
     class RegisterTask extends AsyncTask<String,Void,String>
     {
-        protected void onPreExecute(){}
+        protected void onPreExecute(){
+            Log.e("Pehle", "onPreExecute: ");
+        }
 
         protected String doInBackground(String... arg0) {
 
@@ -275,6 +277,7 @@ public class SignUpActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
+            // TODO: 18/07/18 Debug postexecute 
 //            Toast.makeText(getApplicationContext(), result,
 //                    Toast.LENGTH_LONG).show();
 //            Log.d("Results", "Register "+result);
