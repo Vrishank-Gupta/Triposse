@@ -35,6 +35,14 @@ import com.vrishankgupta.triposse.util.Dob;
 import com.vrishankgupta.triposse.util.User;
 
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,7 +68,7 @@ public class SignUpActivity extends AppCompatActivity {
     private int REQUEST_CAMERA = 0 , SELECT_FILE =1;
     private String userChoosenTask;
 
-    private String imageURL;
+    Bitmap thumbnail;
 
     private android.support.v7.widget.Toolbar mToolbar;
     private Button btnSignUp;
@@ -110,7 +118,11 @@ public class SignUpActivity extends AppCompatActivity {
                     else {
                     ActivityCompat.requestPermissions(
                             SignUpActivity.this,
-                            new String[] {Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_STATE},
+                            new String[] {  Manifest.permission.ACCESS_COARSE_LOCATION,
+                                            Manifest.permission.ACCESS_FINE_LOCATION,
+                                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                            Manifest.permission.READ_PHONE_STATE},
                             44
                     );
                 }
@@ -208,8 +220,7 @@ public class SignUpActivity extends AppCompatActivity {
                 email.getText().toString(),
                 number.getText().toString(),
                 userName.getText().toString(),
-                imei,
-                "Hhhhhhhhhhh"
+                imei
         );
 
         jsonUser = new Gson().toJson(user);
@@ -219,7 +230,46 @@ public class SignUpActivity extends AppCompatActivity {
 //        Log.d("imgurl", "registerUser: " + imageURL);
 
         new RegisterTask().execute();
+        try {
+            uploadImage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+    private void uploadImage() throws Exception
+    {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 75, bos);
+            byte[] data = bos.toByteArray();
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost postRequest = new HttpPost(
+                    "http://10.0.2.2/cfc/iphoneWebservice.cfc?returnformat=json&amp;method=testUpload");
+            ByteArrayBody bab = new ByteArrayBody(data, token+".jpg");
+            // File file= new File("/mnt/sdcard/forest.png");
+            // FileBody bin = new FileBody(file);
+            MultipartEntity reqEntity = new MultipartEntity(
+                    HttpMultipartMode.BROWSER_COMPATIBLE);
+            reqEntity.addPart("uploaded", bab);
+//            reqEntity.addPart("token", new StringBody(token));
+            postRequest.setEntity(reqEntity);
+            HttpResponse response = httpClient.execute(postRequest);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    response.getEntity().getContent(), "UTF-8"));
+            String sResponse;
+            StringBuilder s = new StringBuilder();
+
+            while ((sResponse = reader.readLine()) != null) {
+                s = s.append(sResponse);
+            }
+            System.out.println("Response: " + s);
+        } catch (Exception e) {
+            // handle exception here
+            Log.e(e.getClass().getName(), e.getMessage());
+        }
+    }
+
 
 
     class RegisterTask extends AsyncTask<String,Void,String>
@@ -465,11 +515,11 @@ public class SignUpActivity extends AppCompatActivity {
         }
         ivProfImage.setImageBitmap(bm);
 
-        imageURL = BitMapToString(bm);
+//        imageURL = BitMapToString(bm);
     }
 
     private void onCaptureImageResult(Intent data) {
-        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+        thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         File destination = new File(Environment.getExternalStorageDirectory(),
@@ -486,7 +536,7 @@ public class SignUpActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         ivProfImage.setImageBitmap(thumbnail);
-        imageURL = BitMapToString(thumbnail);
+//        imageURL = BitMapToString(thumbnail);
     }
 
     public String BitMapToString(Bitmap bitmap){

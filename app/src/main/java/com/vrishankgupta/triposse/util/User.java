@@ -10,8 +10,7 @@ public class User{
 	private String contact_number;
 	private String username;
 	private String imei;
-	private String image;
-	public User(String country, String password, String address, Dob dob, String passportNumber, String email, String contactNumber, String username, String imei,String image)
+	public User(String country, String password, String address, Dob dob, String passportNumber, String email, String contactNumber, String username, String imei)
 	{
 		this.country = country;
 		this.password = password;
@@ -22,7 +21,6 @@ public class User{
 		this.contact_number = contactNumber;
 		this.username = username;
 		this.imei = imei;
-		this.image = image;
 
 	}
 
@@ -38,17 +36,10 @@ public class User{
                 ", contact_number='" + contact_number + '\'' +
                 ", username='" + username + '\'' +
                 ", imei='" + imei + '\'' +
-                ", image='" + image + '\'' +
                 '}';
     }
 
-    public String getImage() {
-        return image;
-    }
 
-    public void setImage(String image) {
-        this.image = image;
-    }
 
     public String getCountry() {
 		return country;
